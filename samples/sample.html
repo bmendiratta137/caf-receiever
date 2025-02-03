@@ -1,0 +1,93 @@
+<html>
+    <head>
+        <!-- New Relic Video -->
+        <script type="module" src="../src/logger.js"></script>
+    
+        <script type="module">
+            import sendLog from '../src/logger.js';
+            sendLog("logger loaded");
+        </script>
+        <script src="../dist/newrelic-caf.min.js"></script>
+        <script type="module">
+            import sendLog from '../src/logger.js';
+            sendLog("minified js loaded");
+        </script>
+        <!-- CAF Receiver SDK -->
+        <script src="//www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
+        <script type="module">
+            import sendLog from '../src/logger.js';
+            sendLog("caf sdk loaded");
+        </script>
+    </head>
+<body>
+    <cast-media-player></cast-media-player>
+    <script>
+//     function sendLogToNewRelic(message) {
+//     const licenseKey = '44a7218b80916c682c4b671a6e35978bFFFFNRAL';
+//     const endpointUrl = 'https://log-api.newrelic.com/log/v1';
+
+//     const logPayload = {
+//         message: message,
+//         timestamp: new Date().toISOString()
+//     };
+
+//     fetch(endpointUrl, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'Api-Key': licenseKey
+//         },
+//         body: JSON.stringify([logPayload])
+//     })
+//     .then(response => {
+//         if (response.ok) {
+//             console.log('Log sent successfully');
+//         } else {
+//             console.error('Error sending log:', response.statusText);
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error sending log:', error);
+//     });
+// }
+
+// // Example usage:
+// sendLogToNewRelic('This is a test log message.');
+        nrvideo.Log.level = nrvideo.Log.Levels.ALL;
+        console.log("Setting up New Relic Insights Backend");
+        nrvideo.Core.setBackend(new nrvideo.NRInsightsBackend("11720677", "44a7218b80916c682c4b671a6e35978bFFFFNRAL"));
+        
+        // Init CAF Tracker
+        //  console.log("Adding CAF Tracker");
+        // nrvideo.Core.addTracker(new nrvideo.CAFTracker());
+
+        // Capture JS errors
+        window.onerror = function (msg, url, line) {
+            console.log("Message : " + msg );
+            console.log("url : " + url );
+            console.log("Line number : " + line );
+            newrelic.addPageAction("JSError", {"errMessage": msg, "errUrl": url, "errLine": line});
+        }
+
+        console.log("Starting Cast Receiver Context");
+        cast.framework.CastReceiverContext.getInstance().start();
+        cast.framework.CastReceiverContext.getInstance().setLoggerLevel(cast.framework.LoggerLevel.DEBUG);
+
+        // Config New Relic Insights backend
+        console.log("New Relic Insights backend configured");
+        const context = cast.framework.CastReceiverContext.getInstance();
+        const playerManager = context.getPlayerManager();
+
+// Debug Logger
+        const castDebugLogger = cast.debug.CastDebugLogger.getInstance();
+        const LOG_TAG = 'MyAPP.LOG';
+
+// Enable debug logger and show a 'DEBUG MODE' overlay at top left corner.
+    context.addEventListener(cast.framework.system.EventType.READY, () => {
+        if (!castDebugLogger.debugOverlayElement_) {
+      castDebugLogger.setEnabled(true);
+  }
+});
+    </script>
+</body>
+</html>

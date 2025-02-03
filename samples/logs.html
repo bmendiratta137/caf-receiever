@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Log to New Relic</title>
+</head>
+<body>
+    <h1>Send Log to New Relic</h1>
+    <input type="text" id="logMessage" placeholder="Enter log message" />
+    <button onclick="sendLog()">Send Log</button>
+
+    <script>
+        function sendLog() {
+            const message = document.getElementById('logMessage').value;
+            const licenseKey = 'a2214be1c61f636118bc8af0dce6fd25FFFFNRAL';  // Replace with a secure method of storing the key
+            const endpointUrl = 'https://log-api.newrelic.com/log/v1';
+
+            const logPayload = {
+                message: message,
+                timestamp: new Date().toISOString()
+            };
+
+            fetch(endpointUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Api-Key': licenseKey
+                },
+                body: JSON.stringify([logPayload])
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Log sent successfully');
+                } else {
+                    console.error('Error sending log:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Error sending log:', error);
+            });
+        }
+    </script>
+</body>
+</html>
